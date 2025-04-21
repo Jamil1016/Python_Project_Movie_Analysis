@@ -78,7 +78,7 @@ movies_df['production_companies'] = movies_df['production_companies'].apply(lamb
 movies_df['production_countries'] = movies_df['production_countries'].apply(lambda x: list_name(x))
 ```
 
-Since our focus are for every movies that was produced in United States I filtered out the other movies that was produced in other countries.
+Since our focus is on movies produced in the United States, we filtered out films made in other countries. Additionally, we narrowed the dataset to include only those released between the 1990s and 2020.
 
 ```python
 # Filtering all the movies that was produced in United States.
