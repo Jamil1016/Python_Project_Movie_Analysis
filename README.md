@@ -25,7 +25,7 @@ To analyze the datasets I used several key tools:
 - **Visual Studio Code:** My go-to for executing my Python scripts.
 - **Git & GitHub:** Essential for version control and sharing my Python code and analysis, ensuring collaboration and project tracking.
 
-# Data Preperation and Cleanup
+# Data Preperation and Clean-up
 
 This section contains all the steps performed to prepare the data for analysis ensuring accuracy and usability.
 
@@ -52,15 +52,17 @@ movies_df = pd.read_csv('../movies_metadata.csv', low_memory= False)
 
 ### Cleaining Data
 
- When inspecting the dataset using `movies_df.info()`, I found that the `release_date` column is in type `object`, and `budget` is a `string`. To convert these columns to their appropriate data types, I used `pandas.to_datetime()` for `release_date` and `pandas.to_numeric()` for `budget`.
+ When inspecting the dataset using `movies_df.info()`, I found that the `release_date` column is in type `object`, and [`budget`,`id`,`imdb_id`] are `string`. To convert these columns to their appropriate data types, I used `pandas.to_datetime()` for `release_date` and `pandas.to_numeric()` for [`budget`,`id`,`imdb_id`] .
 
 
 ```python
 # Convert data type of release_date to datetime.
 movies_df['release_date'] = pd.to_datetime(movies_df['release_date'],errors='coerce') 
 
-# Convert data type of budget to numeric.
+# Convert data type to numeric.
 movies_df['budget'] = pd.to_numeric(movies_df['budget'], errors='coerce') 
+movies_df['imdb_id'] = pd.to_numeric(movies_df['imdb_id'], errors='coerce')
+movies_df['id'] = pd.to_numeric(movies_df['id'], errors='coerce') 
 ```
 
 The columns `genres`, `production_companies`, and `production_countries` are stored as strings, but they actually represent lists of dictionaries. Each dictionary contains keys like `id`, `name`, and possibly others.
@@ -120,4 +122,14 @@ Data columns (total 24 columns):
  23  vote_count             21153 non-null  float64       
 dtypes: datetime64[ns](1), float64(5), object(18)
 memory usage: 4.0+ MB
+```
+## Exploratory Data Analysis
+In this part of the project, I will discuss how to answer each question and provide insights. Each question will include data preparation, data visualization, and key takeaways based on the results.
+
+### What genres tend to receive the highest average ratings?
+After cleaning the dataset, I focused on a column containing a list of dictionaries, each holding a genre `name` and its corresponding `id`. I extracted the genre names and transformed the column into a list of genre names. Then, I used the `explode()` function to split the list into separate rows for each genre. Finally, I filtered the dataset to include only movies with a `vote_average` of 8.0 or higher and a `vote_count` greater than 1000—defining these as the highest-rated movies.
+
+```python
+hights_rating_movies = movies_df[(movies_df['vote_count'] > 1000) & (movies_df['vote_average'] >= 8.0)]
+
 ```
