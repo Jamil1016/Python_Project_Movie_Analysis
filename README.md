@@ -133,3 +133,42 @@ After cleaning the dataset, I focused on a column containing a list of dictionar
 hights_rating_movies = movies_df[(movies_df['vote_count'] > 1000) & (movies_df['vote_average'] >= 8.0)]
 
 ```
+
+#### Data Visualized
+
+```python
+sns.set_theme(style= 'ticks')
+sns.barplot(
+    data= genres_count
+    ,x= 'perc'
+    ,y= 'genres'
+    ,hue= 'count'
+    ,palette= 'dark:b_r'
+    ,legend= False
+    )
+
+ax= plt.gca()
+ax.set_title('Likelihood of a Genre in Top-Rated Movies', fontsize= 15)
+ax.set_xlabel('Percentage (%)')
+ax.set_ylabel('Genre')
+ax.set_xlim(0,100)
+ax.spines[['top','right']].set_visible(False)
+
+ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x,i: f'{x:.0f}%'))
+for i, value in enumerate(genres_count['perc']):
+    ax.text(
+        x= value + 1
+        ,y= i
+        ,s= f'{value:.1f}%'
+        ,va= 'center'
+    )
+plt.show()
+```
+
+#### Result
+
+!['Barchart'](./2_Images/Bar_high_rating_genres.png)
+
+#### Analysis
+
+- `Drama` dominates top-rated films at 67.8%, highlighting its emotional impact and broad appeal, while mid-tier genres like `Thriller`, `Crime`, and `Adventure` also stand out for their intensity and intrigue; in contrast, niche genres such as `Horror`, `History`, and `Western` are far less common, appearing in only 3.4% of top movies.
