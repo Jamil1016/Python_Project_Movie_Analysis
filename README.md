@@ -205,7 +205,7 @@ ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, i: f'${y/1_000_000_000}
 ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, i: f'${x/1_000_000_000}B'))
 ```
 #### Result
-!['scatter_Budget vs Revenue'](../Python_Project_Movie_Analysis/2_Images/scatter_Movie%20Budget%20vs%20Box%20Office%20Revenue.png)
+!['scatter_Budget vs Revenue'](./2_Images/scatter_Movie%20Budget%20vs%20Box%20Office%20Revenue.png)
 *Scatterplot shows the relationship of Movie Budget and Box Office Revenue*
 
 #### Analysis
