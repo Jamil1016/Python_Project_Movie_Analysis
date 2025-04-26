@@ -164,11 +164,323 @@ for i, value in enumerate(genres_count['perc']):
     )
 plt.show()
 ```
-
 #### Result
 
-!['Barchart'](./2_Images/Bar_high_rating_genres.png)
+!['Barchart'](./2_Images/bar_Genres%20in%20Top-rated%20Movies.png)
 
 #### Analysis
 
 - `Drama` dominates top-rated films at 67.8%, highlighting its emotional impact and broad appeal, while mid-tier genres like `Thriller`, `Crime`, and `Adventure` also stand out for their intensity and intrigue; in contrast, niche genres such as `Horror`, `History`, and `Western` are far less common, appearing in only 3.4% of top movies.
+
+### How does budget relate to box office revenue?
+First thing to do is filter the dataset and include only movies that have `budget` and `revenue`. Then, using scatterplot show how `revenue` changes as `budget` increases. Add regression line to show the trend, this will help to see if there's a correlation.
+
+```python
+movies_budget_revenue = movies_df[(movies_df['budget'] > 0) & (movies_df['revenue'] > 0)][['budget','revenue']].copy()
+```
+#### Data Visualized
+
+```python
+sns.set_theme(style= 'ticks')
+sns.scatterplot(
+    data= movies_budget_revenue
+    ,x= 'budget'
+    ,y= 'revenue'
+    )
+
+sns.regplot(
+    data= movies_budget_revenue
+    ,x= 'budget'
+    ,y= 'revenue'
+    ,scatter= False
+    ,color= 'red'
+    ,
+    )
+
+ax= plt.gca()
+ax.set_title('Movie Budget vs Box Office Revenue')
+ax.set_xlabel('Budget')
+ax.set_ylabel('Revenue')
+ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, i: f'${y/1_000_000_000}B'))
+ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, i: f'${x/1_000_000_000}B'))
+```
+#### Result
+!['scatter_Budget vs Revenue'](../Python_Project_Movie_Analysis/2_Images/scatter_Movie%20Budget%20vs%20Box%20Office%20Revenue.png)
+*Scatterplot shows the relationship of Movie Budget and Box Office Revenue*
+
+#### Analysis
+- Higher movie budgets generally lead to higher box office revenues, as shown by the upward trend, but the wide scatter reveals that spending more doesn't always guarantee blockbuster success.
+
+### Are there any notable trends in genre popularity or movie ratings over time?
+Start by extracting the year I want to analyze, its ideal if its not that old and have enough numbers of movies. Upon checking the 2018 to 2020 contains less than 10 movies, this will affect our conclusion if we add this years. I decided to use the data from 1971 to 2017.
+
+```python
+movies_df['release_year'] = movies_df['release_date'].dt.year
+movies_1971_2017 = movies_df[(movies_df['release_year'] > 1970) & (movies_df['release_year'] < 2018)]
+```
+
+### *Genre Popularity Over Time*
+
+To analyze the genre popularity over time I need to explode `genres` column, so each movie can show up multiple times if it belongs to multiple genres. Then let's calculate what percentage of all movies each genre took up every year. Let's focus on the top 5 genres.
+
+
+Jupyter Notebook: ['5_Genres_Ratings_Over_Time'](./1_Analysis/5_Genres_Ratings_Over_Time.ipynb)
+```python
+movies_count_yearly = movies_1971_2017['release_year'].value_counts().sort_index()
+
+genres_explode = movies_1971_2017.explode('genres')
+top5_genres = genres_explode['genres'].value_counts().sort_values(ascending= False).head(5).index.to_list()
+
+genres_pivot = genres_explode.pivot_table(columns= 'genres', index= 'release_year', aggfunc= 'size').fillna(0)
+genres_perc = genres_pivot.div(movies_count_yearly / 100, axis= 0)
+```
+
+#### Data Visualized
+```python
+ticks_year = list(range(1971,2019,2))
+
+plt.figure(figsize= (15,7))
+sns.set_theme(style= 'ticks')
+sns.lineplot(
+    data= genres_perc[top5_genres]
+    ,dashes= False
+    ,legend= False
+)
+ax= plt.gca()
+ax.set_title('Genre Popularity Over Time (1971 to 2017)', fontsize= 15)
+ax.set_xlabel('Release Year')
+ax.set_ylabel('Percentage (%)')
+ax.set_xticks(ticks_year)
+ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, i: f'{x:.0f}%'))
+ax.spines[['top','right']].set_visible(False)
+for genre in top5_genres:
+    ax.text(
+        x= 2017.5
+        ,y= genres_perc.loc[[2017],[genre]].values
+        ,s= genre
+        ,va= 'center'
+    )
+```
+#### Result
+
+!['Genre Popularity Over Time (1971 to 2017)'](./2_Images/line_Genre%20Popularity%20Over%20Time%20(1971%20to%202017).png)
+*Line chart showing the genres popularity trend over time*
+
+#### Analysis
+- `Drama` has consistently remained the most popular genre from 1971 to 2017, while `Comedy` maintained strong second-place popularity; meanwhile, `Thriller` and `Action` genres showed gradual growth over time, and `Romance` steadily declined in popularity.
+
+### *Movie Ratings Over Time*
+Filter out movies that have no `vote_average` then group the data by `release_year` and calculate the median rating each year.
+
+Jupyter Notebook: ['5_Genres_Ratings_Over_Time'](./1_Analysis/5_Genres_Ratings_Over_Time.ipynb)
+
+```python
+movie_ratings = movies_1971_2017[movies_1971_2017['vote_average'] > 0]
+yearly_ratings = movie_ratings.groupby('release_year')['vote_average'].median()
+```
+
+#### Data Visualized
+```python
+ticks_year = list(range(1971,2019,2))
+
+plt.figure(figsize= (15,7))
+sns.lineplot(yearly_ratings)
+
+plt.xticks(ticks_year)
+plt.xlabel('Release Year')
+plt.ylabel('Vote Average')
+plt.title('Movie Rating Over Time from 1971 to 2017', fontsize= 15)
+plt.ylim(5,7)
+plt.show()
+```
+
+#### Result
+!['Movie Rating Over Time from 1971 to 2017'](./2_Images/line_Movie%20Rating%20Over%20Time%20from%201971%20to%202017.png)
+
+#### Analysis
+- Movie ratings slightly declined from the early 1970s to the 2000s, stabilizing around an average score of 6, but showed a small upward trend again after 2015, hinting at a recent rise in audience satisfaction.
+
+### Which movies are outliers in terms of profitability or audience reception?
+
+Jupyter Notebook: ['6_Outlier_Movies'](./1_Analysis/6_Outlier_Movies.ipynb)
+
+### *Profitability Outliers*
+Filter only the movies that have budget and revenue then create a column containing the movie profit.
+
+```python
+movies_df = movies_df[(movies_df['budget'] > 0) & (movies_df['revenue'] > 0)].copy()
+movies_df['profit'] = movies_df['revenue'] - movies_df['budget']
+```
+Set the limit to identify if the profit is outlier, I will use `df.quantile(x)` to set the upper and lower limit
+
+```python
+Q1 = movies_df['profit'].quantile(0.25)
+Q3 = movies_df['profit'].quantile(0.75)
+IQR = Q3 - Q1
+
+lower_bound = Q1 - 1.5 * IQR 
+upper_bound = Q3 + 1.5 * IQR
+```
+Using the limit (`lower_bound` and `upper_bound`), create dataset `hue_gain_profit` and `huge_loss_profit`.
+
+```python
+huge_gain_profit = movies_df[movies_df['profit'] > upper_bound].sort_values(by= 'profit', ascending= False).head(5)
+huge_loss_profit = movies_df[movies_df['profit'] < lower_bound].sort_values(by= 'profit', ascending= True).head(5)
+```
+
+#### Data Visualized
+```python
+import matplotlib.gridspec as gridspec
+
+fig = plt.figure(figsize=(20, 8))
+gs = gridspec.GridSpec(2, 2, width_ratios=[1, 1])
+
+# First column, top and bottom rows
+ax1 = fig.add_subplot(gs[0, 0])  # Row 0, Col 0
+ax2 = fig.add_subplot(gs[1, 0])  # Row 1, Col 0
+
+# Second column, spans both rows
+ax3 = fig.add_subplot(gs[:, 1])  # All rows, Col 1
+
+
+sns.barplot(
+    data= huge_gain_profit
+    ,x= 'profit'
+    ,y= 'title'
+    ,hue= 'profit'
+    ,palette= 'dark:g_r'
+    ,legend= False
+    ,ax= ax1
+)
+ax1.set_title('Huge Profit Gains Movies', fontsize= 20)
+ax1.set_ylabel('')
+ax1.set_xlabel('')
+ax1.xaxis.set_major_formatter(plt.FuncFormatter(lambda x,i: f'{x/1_000_000_000}B($)'))
+ax1.set_xlim(0,3_000_000_000)
+for i,profit in enumerate(huge_gain_profit['profit']):
+    ax1.text(
+        x= profit + 25_000_000
+        ,y= i
+        ,s= f'{profit/1_000_000_000:.1f}B($)'
+        ,va= 'center'
+    )
+
+
+sns.barplot(
+    data= huge_loss_profit
+    ,x= 'profit'
+    ,y= 'title'
+    ,hue= 'profit'
+    ,palette= 'dark:r'
+    ,legend= False
+    ,ax= ax2
+)
+ax2.set_title('Huge Loss Profit Movies', fontsize= 20)
+ax2.set_ylabel('')
+ax2.set_xlabel('Profit')
+ax2.xaxis.set_major_formatter(plt.FuncFormatter(lambda x,i: f'{x/1_000_000:.0f}M($)'))
+ax2.set_xlim(-200_000_000,0)
+for i,profit in enumerate(huge_loss_profit['profit']):
+    ax2.text(
+        x= profit - 17_000_000
+        ,y= i
+        ,s= f'{profit/1_000_000:.0f}M($)'
+        ,va= 'center'
+    )
+
+sns.boxenplot(
+    data= movies_df['profit']
+    ,ax=ax3
+    )
+ax3.yaxis.set_major_formatter(plt.FuncFormatter(lambda x,i: f'{x/1_000_000_000:.1f}B($)'))
+ax3.set_ylabel('')
+ax3.set_title('Profit Distribution of All Movies', fontsize= 20)
+
+plt.tight_layout()
+plt.show()
+```
+#### Result
+!['Profit Outlier Visualization'](./2_Images/distplot_Profit%20Outlier%20Visualization.png)
+
+#### Analysis
+- The movie industry's profitability is extremely skewed, and tiny fraction of blockbuster films generate outsized profits, while the vast majority of movies cluster around break-even or incur losses, highlighting a high-risk, high-reward economic model.
+
+- A few iconic movies like *Avatar*, *Star Wars: The Force Awakens*, and *Titanic* dominate industry profits by earning billions, while major titles like *The Lone Ranger* and *Mars Needs Moms* suffered huge losses, proving that even big productions aren't immune to financial failure.
+
+### *Audience Reception Outliers*
+Filter the movies that have at least 500 `vote_counts`.
+```pthon
+rated_movies = movies_df[movies_df['vote_count'] >= 500]
+```
+Find the upper and lower limit using IQR method
+```python
+low_ratings = Q1 - 1.5 * IQR
+high_ratings = Q3 + 1.5 * IQR
+```
+Using the `low_ratings` and `high_ratings` filter the dataset for outliers
+
+```python
+lowest_ratings = rated_movies[rated_movies['vote_average'] < low_ratings].sort_values(by= 'vote_average', ascending= True).head(5)
+highest_ratings = rated_movies[rated_movies['vote_average'] > high_ratings].sort_values(by= 'vote_average', ascending= False).head(5)
+```
+
+#### Data Visualized
+```python
+fig = plt.figure(figsize= (20, 8))
+gs = gridspec.GridSpec(2,2,width_ratios=[1,1])
+
+ax1 = fig.add_subplot(gs[0,0])
+ax2 = fig.add_subplot(gs[1,0])
+ax3 = fig.add_subplot(gs[:,1])
+
+sns.barplot(
+    data= highest_ratings
+    ,x= 'vote_average'
+    ,y= 'title'
+    ,hue= 'vote_average'
+    ,palette= 'dark:g_r'
+    ,legend= False
+    ,ax= ax1
+    )
+ax1.set_title('Highest Rated Movies', fontsize= 15)
+ax1.set_xlabel('')
+ax1.set_ylabel('')
+ax1.set_xlim(0,11)
+
+for i,value in enumerate(highest_ratings['vote_average']):
+    ax1.text(value+.1,i,value)
+
+sns.barplot(
+    data= lowest_ratings
+    ,x= 'vote_average'
+    ,y= 'title'
+    ,hue= 'vote_average'
+    ,palette= 'dark:r'
+    ,legend= False
+    ,ax= ax2
+    )
+ax2.set_title('Lowest Rated Movies', fontsize= 15)
+ax2.set_xlabel('Rating')
+ax2.set_ylabel('')
+ax2.set_xlim(0,11)
+
+for i,value in enumerate(lowest_ratings['vote_average']):
+    ax2.text(value+.1,i,value)
+
+sns.boxplot(rated_movies['vote_average'], ax=ax3)
+ax3.set_ylabel('')
+ax3.set_title('Ratings Distribution of All Movies', fontsize= 15)
+
+plt.tight_layout()
+plt.show()
+```
+#### Result
+!['Ratings Outlier Visualization'](./2_Images/distplot_Ratings%20Outlier%20Visualization.png)
+
+#### Analysis
+- The ratings data shows that *Dilwale Dulhania Le Jayenge* is a clear outlier with an exceptionally high score of 9.1, while the lowest-rated movies like *Jack and Jill*, *Catwoman*, and *Batman & Robin* fall between 4.0 and 4.4, reflecting very poor audience reception.
+
+- Most movies tend to cluster around 6 to 7 rating, suggesting that average quality films are far more common than exceptional hits or major failures. Although extreme outliers exist on both ends, they are relatively rare compared to the large concentration of moderately rated movies.
+
+
+### What are the most common characteristics of successful movies?
