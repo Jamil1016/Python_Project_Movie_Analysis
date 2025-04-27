@@ -484,3 +484,242 @@ plt.show()
 
 
 ### What are the most common characteristics of successful movies?
+A successful movie can be defined based on high audience ratings (vote average ≥ 8.0 with at least 1,000 votes), high profitability (top 10% in profit), or a combination of both strong ratings and profits. To better understand the traits of these successful films, I will analyze key characteristics including their genres, runtime, language, budget, release year and production companies. This analysis will help reveal common patterns among the movies that perform best both critically and financially.
+
+Jupyter Notebook: [7_Succesful_Movies_Characterestics](./1_Analysis/7_Succesful_Movies_Characterestics.ipynb)
+
+```python
+movies = movies_df[(movies_df['budget'] > 0) & (movies_df['revenue'] > 0)].copy()
+movies['profit'] = movies['revenue'] - movies['budget']
+profit_threshold = movies['profit'].quantile(0.90)
+
+successful_movies = movies[(movies['profit'] > profit_threshold) & (movies['vote_average'] >= 8.0) & (movies['vote_count'] >= 1000)]
+```
+
+### *Genres*
+examine the genre distribution of successful movies by first expanding the `genres` column separating movies with multiple genres into individual rows, giving each genre its own entry.
+
+```python
+genres_explode = successful_movies.explode('genres')
+genres_count = genres_explode['genres'].value_counts(normalize= True).reset_index(name= 'perc')
+```
+
+#### Data Visualized
+```python
+sns.set_theme(style= 'ticks')
+sns.barplot(
+    data= genres_count
+    ,x= 'perc'
+    ,y= 'genres'
+    ,hue= 'perc'
+    ,palette= 'dark:b_r'
+    ,legend= False
+    )
+ax= plt.gca()
+ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x,i: f'{x*100:.0f}%'))
+for i,value in enumerate(genres_count['perc']):
+    ax.text(
+        x= value+0.001
+        ,y= i
+        ,s= f'{value*100:.0f}%'
+        ,va= 'center'
+    )
+ax.spines[['top','right']].set_visible(False)
+ax.set_title('Genre Distribution for Successful Movies', fontsize= 15)
+ax.set_xlabel('Distribution (%)')
+ax.set_ylabel('')
+plt.show()
+```
+
+#### Result
+![Genre Distribution for Successful Movies](./2_Images/bar_Genre%20Distribution%20for%20Successful%20Movies.png)
+
+#### Analysis
+- *Drama* and *Adventure* dominate successful movie genres, together making up 31% of the total distribution, suggesting audiences are heavily drawn to emotionally engaging and exciting narratives.
+
+- *Action*, *Thriller*, *Fantasy*, and *Crime* are strong mid-tier genres, each capturing 9 - 10% of the share, highlighting the popularity of suspenseful and imaginative storytelling.
+
+- Genres like *Romance*, *War*, and *Mystery* are the least represented, each with 3% or less, indicating that these genres are less frequently associated with successful movies.
+
+### *Runtime*
+You are analyzing the runtime distribution by first filtering out movies with a runtime of zero, then plotting two Kernel Density Estimation (KDE) curves one for all movies and one for successful movies. This allows you to visually compare how runtimes are distributed across both groups and see whether successful movies tend to be longer, shorter, or similar in length compared to the overall movie set.
+
+```python
+movies_runtime = movies_df[movies_df['runtime'] > 0 ]
+```
+#### Data visualized
+```python
+sns.kdeplot(movies_runtime['runtime'], label='All Movies', fill=True)
+sns.kdeplot(successful_movies['runtime'], label='Successful Movies', fill=True)
+plt.title('Runtime Distribution')
+plt.xlabel('Runtime (mins.)')
+plt.xlim(0,600)
+plt.legend()
+plt.show()
+```
+
+#### Result
+![Runtime Distribution](./2_Images/kde_Runtime%20Distribution.png)
+
+#### Analysis
+- Successful movies tend to have longer runtimes compared to the overall movie population, with a peak around 120–150 minutes, whereas most movies cluster closer to 90–100 minutes.
+- Successful movies have a wider spread in runtime, suggesting that slightly longer, more developed storytelling may contribute to better outcomes.
+
+### *Language*
+To analyze the language distribution among successful movies first calculating the proportion of each original language and converting it to percentages. You then map language codes (like 'en' to English, 'fr' to French) for easier reading.
+
+```python
+successfull_languages = successful_movies['original_language'].value_counts(normalize= True).reset_index(name= 'proportion')
+successfull_languages['proportion'] = successfull_languages['proportion'] * 100
+
+language = {'en':'English', 'ja':'Japanese', 'it':'Italiano', 'fr':'French'}
+successfull_languages['original_language'] = successfull_languages['original_language'].map(language)
+```
+
+#### Data Visualized
+
+```python
+sns.set_theme(style= 'ticks')                     
+sns.barplot(
+    data= successfull_languages
+    ,x= 'original_language'
+    ,y='proportion'
+    ,hue= 'proportion'
+    ,palette= 'dark:b_r'
+    ,legend= False
+)
+ax= plt.gca()
+
+ax.set_xlabel('')
+ax.set_ylabel('Proportion(%)')
+ax.set_title('Language Distribution in Successful Movies')
+ax.set_ylim(0,100)
+ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x,i : f'{x:.0f}%'))
+for i,value in enumerate(successfull_languages['proportion']):
+    ax.text(
+        x= i
+        ,y= value + 3
+        ,s= f'{value:.0f}%'
+        ,ha= 'center'
+    )
+plt.show()
+```
+#### Result
+![Language Distribution in Successful Movies](./2_Images/bar_Language%20Distribution%20in%20Successful%20Movies.png)
+
+#### Analysis
+- English dominates successful movies with 83% of the share, highlighting the global reach and dominance of English-language films.
+
+### *Budget*
+Categorizing successful movies into budget groups based on their budget values.
+
+```python
+def budget_bucket(x):
+    if x < 1e6:
+        return 'Low <M'
+    elif x < 1e7:
+        return 'Mid (1M-10M)'
+    elif x < 5e7:
+        return 'High (10M-50M)'
+    else:
+        return 'Blockbuster (50M+)'
+
+bucket = pd.DataFrame({'budget_group':['Low <M','Mid (1M-10M)','High (10M-50M)','Blockbuster (50M+)']})   
+successful_movies['budget_group'] = successful_movies['budget'].apply(budget_bucket)
+successful_budget_group = successful_movies['budget_group'].value_counts(normalize= True).reset_index(name='proportion')
+budget_group_count = bucket.merge(right=successful_budget_group, how= 'left', on= 'budget_group')
+```
+
+#### Data Visualized
+```python
+sns.set_theme(style= 'ticks')
+sns.barplot(
+    data= budget_group_count
+    ,x= 'proportion'
+    ,y= 'budget_group'
+)
+ax = plt.gca()
+ax.invert_yaxis()
+ax.set_xlabel('Proportion (%)')
+ax.set_ylabel('')
+ax.set_title('Budget Group Distribution of Successful Movies')
+ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x,i: f'{x*100:.0f}%'))
+ax.set_xlim(0,0.70)
+for i,value in enumerate(budget_group_count['proportion']):
+    ax.text(
+        x= value + 0.05
+        ,y= i
+        ,s= f'{value*100:.0f}%'
+    )
+plt.show()
+```
+#### Result
+![Budget Group Distribution of Successful Movies](./2_Images/bar_Budget%20Group%20Distribution%20of%20Successful%20Movies.png)
+
+#### Analysis
+- Successful movies are predominantly those with high budgets ranging from $10 million to $50 million, making up 57% of the total. Blockbusters with budgets exceeding $50 million follow, accounting for 35%. 
+
+- Mid-budget films ($1 million to $10 million) contribute only 9% to the success pool, while low-budget films (below $1 million) are notably absent. 
+
+- This suggests a strong correlation between higher production budgets and movie success, with the $10M–$50M range appearing to offer the most favorable balance between investment and outcome.
+
+### *Release Date*
+To identify what month produce a successful movies, create a column that contains the month number and month name. month number will be used to arrange the month name in graph.
+
+```python
+movies_df['release_month_no'] = movies_df['release_date'].dt.month
+movies_df['release_month'] = movies_df['release_date'].dt.strftime('%b')
+```
+
+#### Data Visualized
+
+```python
+month_bucket = movies_df[['release_month','release_month_no']].drop_duplicates().dropna().sort_values('release_month_no')
+
+successful_month_count = successful_movies['release_month_no'].value_counts().reset_index()
+succesful_movies_month = month_bucket.merge(successful_month_count, how= 'left', left_on= 'release_month_no', right_on= 'release_month_no').drop('release_month_no',axis= 1)
+sns.barplot(
+    data= succesful_movies_month
+    ,x= 'release_month'
+    ,y= 'count'
+)
+ax = plt.gca()
+ax.set_xlim(-1,12)
+ax.set_ylim(0,6)
+ax.set_ylabel('No. of Movies')
+ax.set_xlabel('Release Month')
+ax.set_title('Total Numbers of Successful Movies Release by Month')
+plt.tight_layout()
+plt.show()
+```
+
+#### Result
+![Total Numbers of Successful Movies Release by Month](./2_Images/bar_Total%20Numbers%20of%20Successful%20Movies%20Release%20by%20Month.png)
+
+#### Analysis
+- Successful movie releases peak in July, November, and December, suggesting that summer and holiday seasons are prime times for blockbuster launches, while early spring months like March and April see very few hits.
+
+### *Company*
+Explode the column `production_companies` then use `value_counts()` to identify which company produced morethan one successful movies.
+
+#### Data Visualized
+```python
+company_successful_movies = successful_movies['production_companies'].explode().value_counts().reset_index(name= 'successful_movies')
+top_company = company_successful_movies[company_successful_movies['successful_movies'] > 1]
+sns.barplot(
+    data= top_company
+    ,x= 'successful_movies'
+    ,y= 'production_companies'
+)
+plt.xlim(0,5)
+plt.title('Numbers of Successful Movies Produced by Companies')
+plt.xlabel('Count of Successful Movies')
+plt.ylabel('')
+```
+
+#### Result
+![Numbers of Successful Movies Produced by Companies](./2_Images/bar_Numbers%20of%20Successful%20Movies%20Produced%20by%20Companies.png)
+
+#### Analysis
+- New Line Cinema and Warner Bros. lead in producing successful movies, each with four hits, while several other major studios like Paramount, WingNut Films, and Syncopy closely follow with three, highlighting a competitive but slightly top-heavy industry landscape.
+
