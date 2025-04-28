@@ -1,5 +1,5 @@
 # Overview
-This project aims to perform an in-depth data analysis on a professional-grade movie dataset to uncover meaningful insights into movie ratings, revenue trends, genre popularity, and audience preferences. Leveraging The Movies Dataset from Kaggle, which aggregates data from The Movie Database (TMDb), this analysis integrates multiple data sources, including metadata, user ratings, and financial metrics like budget and revenue.
+This project aims to perform an in-depth data Insights on a professional-grade movie dataset to uncover meaningful insights into movie ratings, revenue trends, genre popularity, and audience preferences. Leveraging The Movies Dataset from Kaggle, which aggregates data from The Movie Database (TMDb), this Insights integrates multiple data sources, including metadata, user ratings, and financial metrics like budget and revenue.
 
 The primary goal is to explore relationships between various movie features such as genre, runtime, popularity, budget, and release date also their influence on audience ratings and box office performance. Additionally, the project examines long-term trends across the film industry and highlights key characteristics of top-performing movies.
 
@@ -17,23 +17,23 @@ Below are the questions to be answer in this project:
 # Skill and Tools Used
 To analyze the datasets I used several key tools:
 
-- **Python:** The backbone of my analysis, allowing me to analyze the data and find critical insights.I also used the following Python libraries:
+- **Python:** The backbone of my Insights, allowing me to analyze the data and find critical insights.I also used the following Python libraries:
     - **Pandas Library:** This was used to analyze the data. 
     - **Matplotlib Library:** I visualized the data.
     - **Seaborn Library:** Helped me create more advanced visuals. 
-- **Jupyter Notebooks:** The tool I used to run my Python scripts which let me easily include my notes and analysis.
+- **Jupyter Notebooks:** The tool I used to run my Python scripts which let me easily include my notes and Insights.
 - **Visual Studio Code:** My go-to for executing my Python scripts.
-- **Git & GitHub:** Essential for version control and sharing my Python code and analysis, ensuring collaboration and project tracking.
+- **Git & GitHub:** Essential for version control and sharing my Python code and Insights, ensuring collaboration and project tracking.
 
 # Data Preperation and Clean-up
 
-This section contains all the steps performed to prepare the data for analysis ensuring accuracy and usability.
+This section contains all the steps performed to prepare the data for Insights ensuring accuracy and usability.
 
 ## Import and Clean Up Data
 
 Download [Kaggle: Movie Dataset](https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset)
 
-Refer to Jupyter Notebook: [1_Data_Importing_Cleaning](./1_Analysis/1_Data_Importing_Cleaning.ipynb)
+Refer to Jupyter Notebook: [1_Data_Importing_Cleaning](./1_Insights/1_Data_Importing_Cleaning.ipynb)
 
 ### Importing Data and Libraries
 
@@ -123,7 +123,7 @@ Data columns (total 24 columns):
 dtypes: datetime64[ns](1), float64(5), object(18)
 memory usage: 4.0+ MB
 ```
-## Exploratory Data Analysis
+## Exploratory Data Insights
 In this part of the project, I will discuss how to answer each question and provide insights. Each question will include data preparation, data visualization, and key takeaways based on the results.
 
 ### What genres tend to receive the highest average ratings?
@@ -168,7 +168,7 @@ plt.show()
 
 !['Barchart'](./2_Images/bar_Genres%20in%20Top-rated%20Movies.png)
 
-#### Analysis
+#### Insights
 
 - `Drama` dominates top-rated films at 67.8%, highlighting its emotional impact and broad appeal, while mid-tier genres like `Thriller`, `Crime`, and `Adventure` also stand out for their intensity and intrigue; in contrast, niche genres such as `Horror`, `History`, and `Western` are far less common, appearing in only 3.4% of top movies.
 
@@ -208,7 +208,7 @@ ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, i: f'${x/1_000_000_000}
 !['scatter_Budget vs Revenue'](./2_Images/scatter_Movie%20Budget%20vs%20Box%20Office%20Revenue.png)
 *Scatterplot shows the relationship of Movie Budget and Box Office Revenue*
 
-#### Analysis
+#### Insights
 - Higher movie budgets generally lead to higher box office revenues, as shown by the upward trend, but the wide scatter reveals that spending more doesn't always guarantee blockbuster success.
 
 ### Are there any notable trends in genre popularity or movie ratings over time?
@@ -224,7 +224,7 @@ movies_1971_2017 = movies_df[(movies_df['release_year'] > 1970) & (movies_df['re
 To analyze the genre popularity over time I need to explode `genres` column, so each movie can show up multiple times if it belongs to multiple genres. Then let's calculate what percentage of all movies each genre took up every year. Let's focus on the top 5 genres.
 
 
-Jupyter Notebook: ['5_Genres_Ratings_Over_Time'](./1_Analysis/5_Genres_Ratings_Over_Time.ipynb)
+Jupyter Notebook: ['5_Genres_Ratings_Over_Time'](./1_Insights/5_Genres_Ratings_Over_Time.ipynb)
 ```python
 movies_count_yearly = movies_1971_2017['release_year'].value_counts().sort_index()
 
@@ -266,13 +266,13 @@ for genre in top5_genres:
 !['Genre Popularity Over Time (1971 to 2017)'](./2_Images/line_Genre%20Popularity%20Over%20Time%20(1971%20to%202017).png)
 *Line chart showing the genres popularity trend over time*
 
-#### Analysis
+#### Insights
 - `Drama` has consistently remained the most popular genre from 1971 to 2017, while `Comedy` maintained strong second-place popularity; meanwhile, `Thriller` and `Action` genres showed gradual growth over time, and `Romance` steadily declined in popularity.
 
 ### *Movie Ratings Over Time*
 Filter out movies that have no `vote_average` then group the data by `release_year` and calculate the median rating each year.
 
-Jupyter Notebook: ['5_Genres_Ratings_Over_Time'](./1_Analysis/5_Genres_Ratings_Over_Time.ipynb)
+Jupyter Notebook: ['5_Genres_Ratings_Over_Time'](./1_Insights/5_Genres_Ratings_Over_Time.ipynb)
 
 ```python
 movie_ratings = movies_1971_2017[movies_1971_2017['vote_average'] > 0]
@@ -297,12 +297,12 @@ plt.show()
 #### Result
 !['Movie Rating Over Time from 1971 to 2017'](./2_Images/line_Movie%20Rating%20Over%20Time%20from%201971%20to%202017.png)
 
-#### Analysis
+#### Insights
 - Movie ratings slightly declined from the early 1970s to the 2000s, stabilizing around an average score of 6, but showed a small upward trend again after 2015, hinting at a recent rise in audience satisfaction.
 
 ### Which movies are outliers in terms of profitability or audience reception?
 
-Jupyter Notebook: ['6_Outlier_Movies'](./1_Analysis/6_Outlier_Movies.ipynb)
+Jupyter Notebook: ['6_Outlier_Movies'](./1_Insights/6_Outlier_Movies.ipynb)
 
 ### *Profitability Outliers*
 Filter only the movies that have budget and revenue then create a column containing the movie profit.
@@ -402,7 +402,7 @@ plt.show()
 #### Result
 !['Profit Outlier Visualization'](./2_Images/distplot_Profit%20Outlier%20Visualization.png)
 
-#### Analysis
+#### Insights
 - The movie industry's profitability is extremely skewed, and tiny fraction of blockbuster films generate outsized profits, while the vast majority of movies cluster around break-even or incur losses, highlighting a high-risk, high-reward economic model.
 
 - A few iconic movies like *Avatar*, *Star Wars: The Force Awakens*, and *Titanic* dominate industry profits by earning billions, while major titles like *The Lone Ranger* and *Mars Needs Moms* suffered huge losses, proving that even big productions aren't immune to financial failure.
@@ -477,16 +477,16 @@ plt.show()
 #### Result
 !['Ratings Outlier Visualization'](./2_Images/distplot_Ratings%20Outlier%20Visualization.png)
 
-#### Analysis
+#### Insights
 - The ratings data shows that *Dilwale Dulhania Le Jayenge* is a clear outlier with an exceptionally high score of 9.1, while the lowest-rated movies like *Jack and Jill*, *Catwoman*, and *Batman & Robin* fall between 4.0 and 4.4, reflecting very poor audience reception.
 
 - Most movies tend to cluster around 6 to 7 rating, suggesting that average quality films are far more common than exceptional hits or major failures. Although extreme outliers exist on both ends, they are relatively rare compared to the large concentration of moderately rated movies.
 
 
 ### What are the most common characteristics of successful movies?
-A successful movie can be defined based on high audience ratings (vote average ≥ 8.0 with at least 1,000 votes), high profitability (top 10% in profit), or a combination of both strong ratings and profits. To better understand the traits of these successful films, I will analyze key characteristics including their genres, runtime, language, budget, release year and production companies. This analysis will help reveal common patterns among the movies that perform best both critically and financially.
+A successful movie can be defined based on high audience ratings (vote average ≥ 8.0 with at least 1,000 votes), high profitability (top 10% in profit), or a combination of both strong ratings and profits. To better understand the traits of these successful films, I will analyze key characteristics including their genres, runtime, language, budget, release year and production companies. This Insights will help reveal common patterns among the movies that perform best both critically and financially.
 
-Jupyter Notebook: [7_Succesful_Movies_Characterestics](./1_Analysis/7_Succesful_Movies_Characterestics.ipynb)
+Jupyter Notebook: [7_Succesful_Movies_Characterestics](./1_Insights/7_Succesful_Movies_Characterestics.ipynb)
 
 ```python
 movies = movies_df[(movies_df['budget'] > 0) & (movies_df['revenue'] > 0)].copy()
@@ -534,7 +534,7 @@ plt.show()
 #### Result
 ![Genre Distribution for Successful Movies](./2_Images/bar_Genre%20Distribution%20for%20Successful%20Movies.png)
 
-#### Analysis
+#### Insights
 - *Drama* and *Adventure* dominate successful movie genres, together making up 31% of the total distribution, suggesting audiences are heavily drawn to emotionally engaging and exciting narratives.
 
 - *Action*, *Thriller*, *Fantasy*, and *Crime* are strong mid-tier genres, each capturing 9 - 10% of the share, highlighting the popularity of suspenseful and imaginative storytelling.
@@ -561,7 +561,7 @@ plt.show()
 #### Result
 ![Runtime Distribution](./2_Images/kde_Runtime%20Distribution.png)
 
-#### Analysis
+#### Insights
 - Successful movies tend to have longer runtimes compared to the overall movie population, with a peak around 120–150 minutes, whereas most movies cluster closer to 90–100 minutes.
 - Successful movies have a wider spread in runtime, suggesting that slightly longer, more developed storytelling may contribute to better outcomes.
 
@@ -607,7 +607,7 @@ plt.show()
 #### Result
 ![Language Distribution in Successful Movies](./2_Images/bar_Language%20Distribution%20in%20Successful%20Movies.png)
 
-#### Analysis
+#### Insights
 - English dominates successful movies with 83% of the share, highlighting the global reach and dominance of English-language films.
 
 ### *Budget*
@@ -656,7 +656,7 @@ plt.show()
 #### Result
 ![Budget Group Distribution of Successful Movies](./2_Images/bar_Budget%20Group%20Distribution%20of%20Successful%20Movies.png)
 
-#### Analysis
+#### Insights
 - Successful movies are predominantly those with high budgets ranging from $10 million to $50 million, making up 57% of the total. Blockbusters with budgets exceeding $50 million follow, accounting for 35%. 
 
 - Mid-budget films ($1 million to $10 million) contribute only 9% to the success pool, while low-budget films (below $1 million) are notably absent. 
@@ -696,7 +696,7 @@ plt.show()
 #### Result
 ![Total Numbers of Successful Movies Release by Month](./2_Images/bar_Total%20Numbers%20of%20Successful%20Movies%20Release%20by%20Month.png)
 
-#### Analysis
+#### Insights
 - Successful movie releases peak in July, November, and December, suggesting that summer and holiday seasons are prime times for blockbuster launches, while early spring months like March and April see very few hits.
 
 ### *Company*
@@ -720,6 +720,25 @@ plt.ylabel('')
 #### Result
 ![Numbers of Successful Movies Produced by Companies](./2_Images/bar_Numbers%20of%20Successful%20Movies%20Produced%20by%20Companies.png)
 
-#### Analysis
+#### Insights
 - New Line Cinema and Warner Bros. lead in producing successful movies, each with four hits, while several other major studios like Paramount, WingNut Films, and Syncopy closely follow with three, highlighting a competitive but slightly top-heavy industry landscape.
 
+# What I Learned
+By doing this project, I deepenend my understanding of data analysis and visualization. I learned how to clean and prepare data, perform exploratory analysis, and create insightful visualizations to uncover patterns and trends. Additionally, I gained experience working with real-world datasets. Overall, this project provided a practical application of my skills and allowed me to gain valuable insights into the world of movies and the industry as a whole. Here are a few specific things I learned:
+
+- ****Data Cleaning and Preparation:*** I learned how to clean and prepare data for analysis, including handling missing values, outliers, and inconsistencies. This is crucial for accurate insights.
+- **Exploratory Data Analysis:*** I practiced exploring data through visualizations and statistical summaries, helping me understand the distribution and relationships within the dataset.
+- **Visualization Techniques:*** I learned various visualization techniques, such as bar charts, line charts, and heatmaps, to effectively communicate insights to stakeholders.
+- **Collaboration and Communication:*** Working in a team environment helped me learn how to communicate effectively and collaborate on insights. It also allowed me to share my findings and insights with others, fostering a collaborative learning environment.
+- **Real-World Data Analysis:*** This project allowed me to apply my skills to a real-world dataset, providing a practical application of my knowledge.
+
+# Insights
+
+- **Genre Popularity:** Drama dominates top-rated films, with Romance and Comedy also being popular genres. Thriller and Action are less common, but Thriller is the most popular among the highest-rated movies.
+- **Movie Ratings:** The average movie rating is around 6, with a slight decline from the early 1970s to the 2000s. After 2015, there is a slight upward trend, indicating a gradual improvement in movie quality.
+- **Budget and Revenue:** There is a general trend showing that higher movie budgets correlate with higher box office revenues. However, the relationship is not absolute, indicating that a large budget does not guarantee blockbuster success.
+- **Trends Over Time:** The industry has seen a steady increase in profitability over time, with a few outliers like Avatar and Titanic representing significant profit gains. The majority of movies break even or incur losses.
+- **Characteristics of Successful Movies:** Drama and Adventure are the most common genres in successful movies, with Action, Thriller, Fantasy, and Crime also being popular. Successful movies tend to have longer runtimes and are predominantly in English. The majority of successful movies are produced by New Line Cinema and Warner Bros.
+
+# Conclusion
+This project provided a comprehensive analysis of a professional-grade movie dataset, allowing me to uncover meaningful insights into movie ratings, revenue trends, genre popularity, and audience preferences. By cleaning and preparing the data, performing exploratory analysis, and creating insightful visualizations, I gained valuable skills in data analysis and visualization. The insights gained from this project have broad implications for the film industry, providing actionable recommendations for studios, filmmakers, and audiences alike.
