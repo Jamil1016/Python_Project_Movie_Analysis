@@ -33,7 +33,7 @@ This section contains all the steps performed to prepare the data for Insights e
 
 Download [Kaggle: Movie Dataset](https://www.kaggle.com/datasets/rounakbanik/the-movies-dataset)
 
-Refer to Jupyter Notebook: [1_Data_Importing_Cleaning](./1_Insights/1_Data_Importing_Cleaning.ipynb)
+Refer to Jupyter Notebook: [1_Data_Importing_Cleaning](./1_Analysis/1_Data_Importing_Cleaning.ipynb)
 
 ### Importing Data and Libraries
 
@@ -224,7 +224,7 @@ movies_1971_2017 = movies_df[(movies_df['release_year'] > 1970) & (movies_df['re
 To analyze the genre popularity over time I need to explode `genres` column, so each movie can show up multiple times if it belongs to multiple genres. Then let's calculate what percentage of all movies each genre took up every year. Let's focus on the top 5 genres.
 
 
-Jupyter Notebook: ['5_Genres_Ratings_Over_Time'](./1_Insights/5_Genres_Ratings_Over_Time.ipynb)
+Jupyter Notebook: ['5_Genres_Ratings_Over_Time'](./1_Analysis/5_Genres_Ratings_Over_Time.ipynb)
 ```python
 movies_count_yearly = movies_1971_2017['release_year'].value_counts().sort_index()
 
@@ -263,7 +263,7 @@ for genre in top5_genres:
 ```
 #### Result
 
-!['Genre Popularity Over Time (1971 to 2017)'](./2_Images/line_Genre%20Popularity%20Over%20Time%20(1971%20to%202017).png)
+!['Genre Popularity Over Time (1971 to 2017)'](./2_Images/line_Genre%20Popularity%20Over%20Time%20%281971%20to%202017%29.png)
 *Line chart showing the genres popularity trend over time*
 
 #### Insights
@@ -272,7 +272,7 @@ for genre in top5_genres:
 ### *Movie Ratings Over Time*
 Filter out movies that have no `vote_average` then group the data by `release_year` and calculate the median rating each year.
 
-Jupyter Notebook: ['5_Genres_Ratings_Over_Time'](./1_Insights/5_Genres_Ratings_Over_Time.ipynb)
+Jupyter Notebook: ['5_Genres_Ratings_Over_Time'](./1_Analysis/5_Genres_Ratings_Over_Time.ipynb)
 
 ```python
 movie_ratings = movies_1971_2017[movies_1971_2017['vote_average'] > 0]
@@ -302,7 +302,7 @@ plt.show()
 
 ### Which movies are outliers in terms of profitability or audience reception?
 
-Jupyter Notebook: ['6_Outlier_Movies'](./1_Insights/6_Outlier_Movies.ipynb)
+Jupyter Notebook: ['6_Outlier_Movies'](./1_Analysis/6_Outlier_Movies.ipynb)
 
 ### *Profitability Outliers*
 Filter only the movies that have budget and revenue then create a column containing the movie profit.
@@ -486,7 +486,7 @@ plt.show()
 ### What are the most common characteristics of successful movies?
 A successful movie can be defined based on high audience ratings (vote average ≥ 8.0 with at least 1,000 votes), high profitability (top 10% in profit), or a combination of both strong ratings and profits. To better understand the traits of these successful films, I will analyze key characteristics including their genres, runtime, language, budget, release year and production companies. This Insights will help reveal common patterns among the movies that perform best both critically and financially.
 
-Jupyter Notebook: [7_Succesful_Movies_Characterestics](./1_Insights/7_Succesful_Movies_Characterestics.ipynb)
+Jupyter Notebook: [7_Succesful_Movies_Characterestics](./1_Analysis/7_Succesful_Movies_Characterestics.ipynb)
 
 ```python
 movies = movies_df[(movies_df['budget'] > 0) & (movies_df['revenue'] > 0)].copy()
